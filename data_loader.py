@@ -68,9 +68,9 @@ with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
         for future in tqdm(google_sheet_futures.keys(), total=total_sheets, desc="Сохранение листов"):
             sheet_name, df = future.result()
             df.to_excel(writer, sheet_name=sheet_name, index=False)
-            print(f'Лист "{sheet_name}" также сохранён в {file_path}')
+            print(f'Лист "{sheet_name}" сохранён в {file_path}')
 
         # Сохранение курсов валют
         currency_sheet_name, currency_df = currency_future.result()
         currency_df.to_excel(writer, sheet_name=currency_sheet_name, index=False)
-        print(f'Лист "{currency_sheet_name}" также сохранён в {file_path}')
+        print(f'Лист "{currency_sheet_name}" сохранён в {file_path}')

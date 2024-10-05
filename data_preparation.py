@@ -95,24 +95,31 @@ marketing_data.columns = marketing_data.iloc[0]
 marketing_data = marketing_data[1:]
 # Заменяем 'Mersedes' на 'Mercedes' в столбце 'Domain'
 marketing_data['Domain'] = marketing_data['Domain'].str.replace('Mersedes', 'Mercedes', case=False)
-marketing_data['Марка'] = ''
+#Меняем "-" на 0
+marketing_data['Bounce Rate'] = marketing_data['Bounce Rate'].apply(lambda x: '0' if x == '-' else x)
+marketing_data['Avg. Session Duration'] = marketing_data['Avg. Session Duration'].apply(lambda x: '0' if x == '-' else x)
+#Обрабатываем ошибочные записи
+marketing_data['Keyword'] = marketing_data['Keyword'].apply(lambda x: '(not set)' if ('#ИМЯ' in x
+                                                                                      or '#ERROR' in x
+                                                                                      or '#NAME' in x
+                                                                                      or '#REF' in x) else x)
+marketing_data['Марка'] = '' #Добавляем столбцы пустые Марка и модель
 marketing_data['Модель'] = ''
-
 currency_data = pd.DataFrame(workbook['Курсы валют'].values)
-currency_data.columns = currency_data.iloc[0]
+currency_data.columns = currency_data.iloc[0] #Устанавливаем названия столбцов
 currency_data = currency_data[1:]
 
 # Создание словаря курсов валют
 currency_dict = dict(zip(currency_data['Букв. код'], currency_data['Курс']))
 
-# Создание словаря курсов валют
+# Создание словаря Марка и модель
 model_dict = dict(zip(reference['Модель'], reference['Марка']))
-print(model_dict)
+
 
 # Использование многопоточности для выполнения функций параллельно
 with ThreadPoolExecutor() as executor:
     futures = {
-        'marketing_data': executor.submit(model_add, model_dict, marketing_data),
+        'marketing_data': executor.submit(model_add, model_dict, marketing_data), #Заполняем столбцы Марка и модель
         'reference': executor.submit(calculate_price, reference)
     }
 
